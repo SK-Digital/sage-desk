@@ -1,0 +1,101 @@
+# SageDesk Cursor Rules
+
+## 1. Core Principles & Project Structure
+
+1.  **Readability & Maintainability:** Prioritize clear, concise, and well-structured code. Use meaningful variable, function, and component names.
+2.  **Performance Optimization:** Aim for optimal performance in Next.js, especially with server-side rendering (SSR), static site generation (SSG), and client-side rendering (CSR) where appropriate.
+3.  **Security:** Implement secure coding practices, especially for API interactions and authentication.
+4.  **Accessibility (A11y):** All UI components must be built with accessibility in mind, adhering to WCAG guidelines where applicable (e.g., proper ARIA attributes, keyboard navigation, sufficient color contrast).
+5.  **Documentation:** `Helpdesk/markdown/architecture/structure.md` must only document features and structure that are **actually implemented**. Mark mockups as such if included. This document must be updated after all major changes to the codebase or project structure.
+6.  **Contributor Adherence:** All contributors must review and adhere to these rules before merging or releasing changes.
+
+---
+
+## 2. Next.js Best Practices
+
+1.  **App Router First:** Utilize the Next.js App Router for new features and pages.
+2.  **Server Components Preference:** Favor React Server Components (RSC) by default for data fetching and rendering static/server-rendered content to reduce client-side JavaScript. Use `'use client'` directives only when interactive client-side functionality (hooks, event listeners) is required.
+3.  **Data Fetching:**
+    * For **server-side data fetching**, use `fetch` directly in Server Components or Next.js API Routes/Server Actions. Leverage Next.js's built-in caching mechanisms.
+    * For **client-side data fetching** (e.g., after user interaction), use a library like **React Query (TanStack Query)** or **SWR** for efficient caching, revalidation, and error handling.
+4.  **API Routes/Server Actions:**
+    * For internal API logic, prefer **Server Actions** for form submissions and mutations, as they offer direct integration with React and Next.js forms.
+    * Use **API Routes** (Route Handlers) for general-purpose RESTful endpoints, third-party webhooks, or when a separate API layer is beneficial.
+    * **Authentication Proxy:** When integrating with Snipe-IT's API, create **Next.js API Routes** as a **proxy layer**. This hides your Snipe-IT API key/token from the client-side and allows you to add server-side logic (e.g., caching, error handling, input validation) before forwarding requests to Snipe-IT.
+5.  **Image Optimization:** Use `next/image` for all images to ensure automatic optimization, lazy loading, and proper sizing.
+6.  **Routing:** Utilize `next/link` for client-side navigation to enable prefetching and a smoother user experience.
+7.  **Environment Variables:** Store sensitive information (like Snipe-IT API keys, database credentials) in `.env.local` files and access them using `process.env.YOUR_VARIABLE_NAME`. Never expose sensitive keys to the client-side.
+8.  **Error Handling:** Implement robust error boundaries for React components. For Next.js specific errors, use `error.js` files in your route segments and `global-error.js` for root-level errors. Handle expected errors gracefully with user-friendly messages.
+
+---
+
+## 3. Tailwind CSS Best Practices
+
+1.  **Utility-First Philosophy:** Primarily use Tailwind's utility classes for styling. Avoid writing custom CSS unless absolutely necessary (e.g., for complex animations or very specific overrides that Tailwind can't easily achieve).
+2.  **Configuration:** Customize your `tailwind.config.js` file to define a consistent design system (colors, typography, spacing, breakpoints, etc.) that aligns with `Helpdesk/markdown/core-style.md`. This promotes consistency and reusability.
+3.  **Mobile-First Design:** Build your UI components with a mobile-first approach. Apply base styles for small screens and then use Tailwind's responsive prefixes (e.g., `sm:`, `md:`, `lg:`) for larger breakpoints.
+4.  **Avoid `@apply` Overuse:** While `@apply` can be useful for minor refactoring of common utility groups, avoid over-relying on it. It can obscure the utility-first nature of Tailwind and make refactoring harder. Prefer composing utilities directly in JSX or creating reusable components.
+5.  **Purge/Safelist:** Ensure Tailwind's JIT mode (or PurgeCSS in older versions) is correctly configured to remove unused CSS, leading to smaller bundle sizes.
+6.  **Theming (Teal Focus):** Define your core **teal color palette** in `tailwind.config.js` (e.g., `primary: { 50: '#...', 100: '#...', ..., 900: '#...' }`) and consistently use these custom colors throughout the application.
+
+---
+
+## 4. React Best Practices
+
+1.  **Functional Components & Hooks:** Use functional components and React Hooks for all new development. Avoid class components.
+2.  **Component Reusability:**
+    * Design components to be **single-responsibility** and **reusable**.
+    * Accept props for customization (e.g., `variant`, `size`, `className`, `onClick`).
+    * Use **`clsx`** (or similar utility) to conditionally combine Tailwind classes for different component states or props, making it easy to override styles externally.
+    * **Component Composition:** Build complex UIs by composing smaller, simpler components.
+    * Maintain a dedicated `components/` directory structure, potentially categorized (e.g., `components/ui`, `components/forms`, `components/layout`).
+3.  **State Management:**
+    * For **local component state**, use `useState`.
+    * For **complex component logic**, use `useReducer`.
+    * For **global state** (e.g., user authentication status, global notifications), consider Context API or a lightweight state management library like **Zustand** or **Jotai**. Avoid "prop drilling."
+4.  **Props & Typing:**
+    * Use **TypeScript** for all components to ensure strong typing of props, state, and API responses. This catches errors early and improves developer experience.
+    * Destructure props clearly in component signatures.
+5.  **Keys for Lists:** Always provide a unique `key` prop when rendering lists of elements to optimize React's reconciliation process and prevent unexpected behavior.
+6.  **Memoization:** Use `React.memo`, `useMemo`, and `useCallback` judiciously to prevent unnecessary re-renders of components and expensive computations, but avoid premature optimization.
+7.  **Conditional Rendering:** Use clear and concise methods for conditional rendering (e.g., `&&`, ternary operator, early returns).
+
+---
+
+## 5. UI/UX & Consistency
+
+1.  **Design System Adherence:** All UI and styling **must strictly follow the requirements** in `Helpdesk/markdown/core-style.md`. This includes typography, color palette (especially teal variations), spacing, border-radius, shadows, and component states.
+2.  **Reusable Components Catalogue:** Implicitly, all shared UI elements (buttons, inputs, cards, modals, navigation items, etc.) should exist as dedicated, reusable React components.
+3.  **Consistent Layouts:** Establish consistent page layouts and structural components (e.g., header, sidebar, footer) and reuse them across different routes.
+4.  **Form Elements:** Ensure all form inputs, labels, and validation messages are consistently styled and behave predictably across the application.
+5.  **Feedback & States:** Provide clear visual feedback for user interactions (e.g., loading states, success messages, error messages, disabled states for buttons/inputs).
+
+---
+
+## 6. API Integration (Snipe-IT & Others)
+
+1.  **Centralized API Calls:** Create a dedicated `lib/api` or `services/` directory for all external API interactions (e.g., `services/snipeit.ts`). This centralizes logic, handles headers, error parsing, and potential rate limiting.
+2.  **Authentication Flow:**
+    * Implement an **authentication layer** in Next.js API Routes to handle the exchange of credentials with Snipe-IT's API (e.g., token acquisition).
+    * Store sensitive tokens securely (e.g., **HTTP-only cookies** or server-side only in memory/environment variables, never in client-side local storage for critical tokens).
+    * Ensure all requests to Snipe-IT's API from your Next.js backend include the necessary authorization headers.
+3.  **Input Validation & Sanitization:** All data received from the client or external APIs must be validated and sanitized before being processed or stored to prevent security vulnerabilities (e.g., XSS, injection attacks). Use libraries like **Zod** or **Yup** for schema validation.
+4.  **Error Handling for APIs:** Implement robust error handling for API calls, distinguishing between network errors, API-specific errors (e.g., 401 Unauthorized, 404 Not Found, 429 Too Many Requests), and internal server errors. Provide informative error messages to the client.
+5.  **User Automation Creation:**
+    * The helpdesk system's UI will trigger **Server Actions** or **API Routes**.
+    * These backend functions will then interact with the **Snipe-IT API** to create users (`POST /users`), check out assets (`POST /hardware/{id}/checkout`), and update statuses.
+    * For **document auto-creation**, the server-side code (in Server Actions or API Routes) will fetch necessary data from Snipe-IT and the helpdesk's database, then use a suitable library (e.g., `python-docx` if you integrate a Python backend service, or a Node.js equivalent) to generate the Word document. The document can then be stored (e.g., in cloud storage) and a link provided to the user/ticket.
+
+---
+
+## 7. Common Pitfalls to Avoid
+
+1.  **Over-fetching/Under-fetching:** Fetch only the data truly needed for a given component or page.
+2.  **Hydration Errors:** Be mindful of client-side-only logic that tries to run during server-side rendering (e.g., direct `window` or `document` access outside of `useEffect`).
+3.  **"Props Drilling":** When state needs to be passed deeply through many components, consider using React Context or a global state management library.
+4.  **CSS Specificity Issues:** Stick to Tailwind's utility-first approach to minimize CSS conflicts. If custom CSS is unavoidable, use CSS Modules or scoped styles.
+5.  **Uncontrolled Components:** For forms, favor controlled components where form state is managed by React state.
+6.  **Missing `key` prop:** Always include unique `key` props for elements rendered in lists to prevent rendering issues and optimize performance.
+7.  **Directly Exposing API Keys:** Never embed API keys for backend services directly in client-side code. Use Next.js API Routes as a proxy.
+8.  **Ignoring Loading States:** Provide clear loading indicators for asynchronous operations (data fetching, form submissions) to improve user experience.
+9.  **Lack of Error Handling:** Implement try-catch blocks for API calls and error boundaries for UI components.

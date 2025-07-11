@@ -1,0 +1,13 @@
+# .cursorrules
+
+- When the user provides ideas, details, or requests for documentation, organize them into relevant markdown files under the Helpdesk/markdown/ directory.
+- Create subfolders within Helpdesk/markdown/ as needed to categorize documentation (e.g., roadmap, architecture, guides, references, etc.).
+- Each document should be a markdown (.md) file with a clear, descriptive name.
+- If a document fits into an existing category, add or update the relevant file; otherwise, create a new subfolder and file as appropriate.
+- Maintain a README.md in Helpdesk/markdown/ that provides an overview and links to all subfolders and key documents.
+- Do not remove or overwrite user content unless explicitly instructed.
+- Always confirm the structure and naming conventions with the user if there is ambiguity.
+- Keep documentation organized, concise, and easy to navigate.
+- Use semantic, human-readable folder and file names.
+- Do not include implementation code in documentation unless specifically requested.
+- When in doubt, ask the user for clarification on how to organize or title a document. 
